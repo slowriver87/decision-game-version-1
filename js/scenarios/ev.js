@@ -17,7 +17,7 @@ const REAL_WORLD = {
   gain: [
     'Selling a winning stock early to "lock in" gains, even when your thesis says it should keep running, is the same pull toward the sure thing. It\'s called the disposition effect.',
     'Poker tournament "chops": players often take a guaranteed split below their chip-EV just to remove variance.',
-    'Lawsuit settlements: plaintiffs routinely accept sure offers below the expected trial award.',
+    'Game shows like Deal or No Deal: contestants routinely take the banker\'s sure offer even when it\'s below the average of the boxes left.',
   ],
   loss: [
     'Traders who won\'t close a losing position, hoping to get back to even, are taking the gamble over the sure loss. Desks use hard stop-losses for exactly this reason.',

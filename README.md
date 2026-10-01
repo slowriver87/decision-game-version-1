@@ -9,7 +9,7 @@ It works fully offline once installed. There are no accounts, no tracking, and n
 | Type | You decide | You learn |
 |---|---|---|
 | **Expected value** | Sure thing vs gamble (gains, losses, coin flips, longshots) | EV, how much EV a wrong pick gave up, loss aversion, longshot bias |
-| **Bayesian updating** | Drag a slider to estimate a probability (medical tests, fraud alerts, urns, recession signals, poker tells) | Base rates, shown on a 1,000-dot frequency grid |
+| **Bayesian updating** | Drag a slider to estimate a probability (metal detectors, lost historical letters, rookie scouts, stock screeners, urns, recession signals, poker tells) | Base rates, shown on a 1,000-dot frequency grid |
 | **Poker pot odds** | Call or fold vs a face-up all-in | Outs, the rule of 2 and 4, pot odds vs exact equity |
 | *Kelly bet sizing* | *Phase 2* | |
 | *Optimal stopping* | *Phase 2* | |

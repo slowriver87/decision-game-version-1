@@ -2,7 +2,7 @@
 import { posterior, posteriorRepeated, naturalFrequencies, scoreEstimate, CORRECT_WITHIN } from '../core/bayes.js';
 import { pct, int } from '../core/format.js';
 
-// Base-rate ranges (in %) by level: rarer conditions are harder to reason about.
+// Base-rate ranges (in %) by level: rarer things are harder to reason about.
 const PRIOR = [null, [10, 30, 5], [5, 15, 1], [2, 10, 1], [1, 5, 1], [1, 3, 0.5]];
 
 const prior = (rng, level) => {
@@ -11,33 +11,67 @@ const prior = (rng, level) => {
 };
 
 const TEMPLATES = {
-  medical(rng, level) {
+  treasure(rng, level) {
     const p = prior(rng, level);
     const hit = rng.step(80, 99, 1) / 100;
     const fa = rng.step(3, 15, 1) / 100;
-    const disease = rng.pick(['a rare blood condition', 'an early-stage infection', 'a genetic marker']);
+    const [place, prize] = rng.pick([
+      ['an old shipwreck beach', 'a silver coin'],
+      ['a Civil War campsite', 'a brass button'],
+      ['a Roman fort site', 'a Roman coin'],
+    ]);
     const twice = level >= 5 && rng.chance(0.5);
     return {
       prior: p, hit, falseAlarm: fa, times: twice ? 2 : 1,
-      title: 'The positive test',
-      body: `${pct(p)} of people your age have ${disease}. The test catches ${pct(hit)} of real cases. It also flags ${pct(fa)} of healthy people by mistake. ` +
-        (twice ? 'You test positive, then test positive <b>again</b> on an independent retest.' : 'You test positive.'),
-      question: 'What\'s the chance you actually have it?',
-      unit: 'people', hName: 'sick', notHName: 'healthy', sigName: 'test positive',
-      realWorld: 'Mammograms, PSA tests and drug screens all have this structure. A positive result on a rare condition is often more likely to be a false alarm, which is why doctors order a second test.',
+      title: 'Metal detector',
+      body: `You're sweeping ${place}. ${pct(p)} of the spots you check hide ${prize}. Your detector beeps over ${pct(hit)} of real finds. It also beeps over ${pct(fa)} of spots with nothing but bottle caps. ` +
+        (twice ? 'It beeps, and then beeps <b>again</b> on a second, independent sweep.' : 'It beeps.'),
+      question: `What's the chance there's really ${prize} down there?`,
+      unit: 'spots', hName: 'real finds', notHName: 'bottle-cap spots', sigName: 'beep',
+      realWorld: 'Any screen for a rare thing works like this, from spam filters and airport scanners to stock screeners. When the real thing is rare, most alarms are false, which is why a second independent check is so powerful.',
     };
   },
-  fraud(rng, level) {
+  letter(rng, level) {
     const p = prior(rng, Math.min(5, level + 1));
     const hit = rng.step(85, 99, 1) / 100;
-    const fa = rng.step(1, 8, 1) / 100;
+    const fa = rng.step(2, 12, 1) / 100;
+    const who = rng.pick(['Napoleon', 'Abraham Lincoln', 'Queen Elizabeth I', 'Benjamin Franklin']);
+    const twice = level >= 5 && rng.chance(0.5);
+    return {
+      prior: p, hit, falseAlarm: fa, times: twice ? 2 : 1,
+      title: 'The lost letter',
+      body: `A "lost letter from ${who}" turns up at auction. Only ${pct(p)} of letters like this turn out genuine. An ink-and-paper expert approves ${pct(hit)} of genuine letters, but is also fooled by ${pct(fa)} of good fakes. ` +
+        (twice ? 'The expert approves it, and a <b>second</b>, independent expert approves it too.' : 'The expert approves it.'),
+      question: 'What\'s the chance the letter is genuine?',
+      unit: 'letters', hName: 'genuine', notHName: 'fakes', sigName: 'get approved',
+      realWorld: 'Art authentication, "lost" manuscripts and rare-coin grading all live with this. When fakes vastly outnumber the real thing, even a good expert\'s approval leaves real doubt. That\'s why big sales demand provenance as well.',
+    };
+  },
+  rookie(rng, level) {
+    const p = prior(rng, level);
+    const hit = rng.step(70, 95, 5) / 100;
+    const fa = rng.step(5, 25, 5) / 100;
+    const sport = rng.pick(['basketball', 'baseball', 'football', 'hockey']);
     return {
       prior: p, hit, falseAlarm: fa, times: 1,
-      title: 'Fraud alert',
-      body: `${pct(p)} of card transactions at a merchant are fraudulent. The bank's model flags ${pct(hit)} of fraud. It also flags ${pct(fa)} of honest transactions.`,
-      question: 'A transaction gets flagged. What\'s the chance it\'s really fraud?',
-      unit: 'transactions', hName: 'fraudulent', notHName: 'honest', sigName: 'get flagged',
-      realWorld: 'This is why your card gets declined on perfectly normal purchases. When fraud is rare, most alerts are false positives. Banks tune the threshold to balance annoyed customers against missed fraud.',
+      title: 'The star scout',
+      body: `${pct(p)} of first-round ${sport} rookies become All-Stars. A famous scout labels ${pct(hit)} of future All-Stars as "can't miss". But the scout also says "can't miss" about ${pct(fa)} of rookies who never make it.`,
+      question: 'The scout calls your team\'s rookie "can\'t miss". What\'s the chance they become an All-Star?',
+      unit: 'rookies', hName: 'future All-Stars', notHName: 'busts', sigName: 'get the label',
+      realWorld: 'Draft hype, hot fund managers and "next big thing" startups. Rave reviews are common and true stars are rare, so most "can\'t miss" picks miss.',
+    };
+  },
+  breakout(rng, level) {
+    const p = prior(rng, level);
+    const hit = rng.step(70, 95, 5) / 100;
+    const fa = rng.step(5, 25, 5) / 100;
+    return {
+      prior: p, hit, falseAlarm: fa, times: 1,
+      title: 'Breakout alert',
+      body: `${pct(p)} of small-cap stocks double within a year. A popular screener flags ${pct(hit)} of those future doublers ahead of time. It also flags ${pct(fa)} of stocks that go nowhere.`,
+      question: 'A stock just got flagged. What\'s the chance it doubles?',
+      unit: 'stocks', hName: 'future doublers', notHName: 'duds', sigName: 'get flagged',
+      realWorld: 'Every backtest that says "this signal caught 90% of the big winners" is quoting the hit rate. The question that matters is what share of flagged stocks win, and that depends on how many duds also trip the signal.',
     };
   },
   urn(rng, level) {
@@ -91,7 +125,7 @@ const TEMPLATES = {
 };
 
 export function generate(rng, level) {
-  const kinds = level === 1 ? ['medical', 'urn', 'fraud', 'tell'] : Object.keys(TEMPLATES);
+  const kinds = level === 1 ? ['treasure', 'urn', 'letter', 'tell', 'rookie'] : Object.keys(TEMPLATES);
   const kind = rng.pick(kinds);
   const t = TEMPLATES[kind](rng, level);
   return { type: 'bayes', level, kind, ...t };
@@ -118,7 +152,7 @@ export function grade(s, guess) {
     `Picture <b>1,000 ${s.unit}</b>. The base rate (how common it is before any evidence) is ${pct(s.prior)}, so about <b>${int(f.h)}</b> are ${s.hName} and ${int(f.notH)} are ${s.notHName}.`,
     s.times === 2
       ? `Of the ${int(f.h)}, ${pct(s.hit)} × ${pct(s.hit)} = ${pct(hit)} ${s.sigName} twice, which is about <b>${int(f.hPos)}</b>.`
-      : `Of the ${int(f.h)} who are ${s.hName}, ${pct(s.hit)} ${s.sigName}, about <b>${int(f.hPos)}</b>.`,
+      : `Of the ${int(f.h)} that are ${s.hName}, ${pct(s.hit)} ${s.sigName}, about <b>${int(f.hPos)}</b>.`,
     s.times === 2
       ? `Of the ${int(f.notH)} ${s.notHName}, ${pct(s.falseAlarm)} × ${pct(s.falseAlarm)} = ${pct(fa, 2)} ${s.sigName} twice by bad luck, about <b>${int(f.notHPos)}</b>.`
       : `But ${pct(s.falseAlarm)} of the ${int(f.notH)} ${s.notHName} ${s.sigName} too. That's about <b>${int(f.notHPos)}</b> false alarms.`,
@@ -128,7 +162,7 @@ export function grade(s, guess) {
   ];
 
   let takeaway;
-  if (truth < 0.5 && s.hit >= 0.8) takeaway = 'An accurate test on a rare thing still mostly produces false alarms. Start from the base rate, then adjust.';
+  if (truth < 0.5 && s.hit >= 0.8) takeaway = 'An accurate signal for a rare thing still mostly produces false alarms. Start from the base rate, then adjust.';
   else if (truth > 0.7) takeaway = 'Here the evidence was strong enough to overwhelm the base rate. Strong evidence should move you a lot.';
   else takeaway = 'Your answer depends on two things: how common it was to start with, and how much likelier the evidence is if it\'s true than if it\'s false.';
 
@@ -150,7 +184,7 @@ export const meta = {
   name: 'Bayesian updating',
   short: 'Bayes',
   primer: [
-    'You\'ll get a <b>base rate</b> (how common something is) and a <b>signal</b> (a test, an alert, a tell) that\'s right most of the time but not always.',
+    'You\'ll get a <b>base rate</b> (how common something is) and a <b>signal</b> (a detector beep, an expert\'s opinion, a tell) that\'s right most of the time but not always.',
     'The trick: imagine 1,000 cases. Count the true alarms and the false alarms. Your answer is true alarms ÷ all alarms.',
     'When the thing is rare, false alarms from the huge "normal" group often outnumber the real cases.',
   ],

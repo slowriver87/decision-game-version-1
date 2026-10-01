@@ -1,6 +1,6 @@
 // Offline support: precache every file, serve cache-first.
 // Bump VERSION whenever you change any file so phones pick up the update.
-const VERSION = 'dm-v1';
+const VERSION = 'dm-v2';
 const FILES = [
   './',
   './index.html',
