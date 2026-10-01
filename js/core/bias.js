@@ -51,6 +51,16 @@ export const BIASES = {
     insight: 'You folded draws that were getting a good enough price to call.',
     fix: 'Losing most of the time is fine when the payoff is big enough. Trust the price.',
   },
+  overconfidence: {
+    name: 'Overconfidence',
+    insight: 'You said you were very sure and turned out wrong. That costs more than an honest "not sure".',
+    fix: 'Before locking in 95%, ask: would I really be wrong only 1 time in 20?',
+  },
+  underconfidence: {
+    name: 'Underconfidence',
+    insight: 'You were right but said you were basically guessing, which left points on the table.',
+    fix: 'If you have a reason for your pick, back it with more than 25%.',
+  },
   overBetting: {
     name: 'Over-betting',
     insight: 'You staked more than your edge justified, so a few losses did outsized damage.',

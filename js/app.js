@@ -4,6 +4,7 @@ import { planSession, ROUNDS } from './core/session.js';
 import { updateRating, levelOf } from './core/difficulty.js';
 import { updateStreak, liveStreak, dayKey, recentAccuracy, accuracySeries, mostCommonBias, sessionBreakdown } from './core/stats.js';
 import { BIASES, tallyBiases } from './core/bias.js';
+import { calibrationTable } from './core/calibration.js';
 import { money, pct } from './core/format.js';
 import { TYPES, TYPE_IDS, LIMITS } from './scenarios/index.js';
 import { h, toast, confirmDialog } from './ui/dom.js';
@@ -189,6 +190,7 @@ function answer(sc, ans) {
   current.rounds[i] = {
     type, level: current.levels[i], score: result.score, correct: result.correct,
     biasTags: result.biasTags, evLost: result.evLost || 0,
+    ...(typeof result.conf === 'number' ? { conf: result.conf } : {}),
   };
   state.skills[type] = { rating: updateRating(rating(type), result.score) };
   persist();
@@ -309,6 +311,7 @@ function renderStats() {
            h('p', { class: 'small', style: 'margin:0' }, h('b', {}, 'Fix: '), BIASES[top.id]?.fix ?? ''),
            h('p', { class: 'note', style: 'margin:8px 0 0' }, `Showed up ${top.count}× in your last ${Math.min(20, state.sessions.length)} session${Math.min(20, state.sessions.length) === 1 ? '' : 's'}.`)]
         : h('p', { class: 'sub', style: 'margin:0' }, 'Play a few sessions and patterns will show up here.')),
+    calibrationCard(),
     h('h3', {}, 'Accuracy by type'),
     h('p', { class: 'note' }, 'Average score per session, oldest to newest. Tap the line to see a session.'),
     TYPE_IDS.map(id => {
@@ -325,6 +328,21 @@ function renderStats() {
     }),
   ];
   mount(screen({ title: 'Stats', content }));
+}
+
+function calibrationCard() {
+  const rows = calibrationTable(state.sessions);
+  if (!rows.length) return null;
+  return h('div', { class: 'card' },
+    h('span', { class: 'eyebrow' }, 'Confidence calibration'),
+    h('p', { class: 'small sub', style: 'margin:4px 0 8px' }, 'When you say you\'re X% sure, are you right X% of the time? Well calibrated means the two columns match.'),
+    h('div', { class: 'calib' },
+      h('span', { class: 'k' }, 'You said'), h('span', { class: 'k' }, 'You were right'), h('span', { class: 'k' }, ''),
+      rows.map(r => [
+        h('span', {}, pct(r.conf, 0)),
+        h('span', {}, `${pct(r.rate, 0)} `, h('span', { class: 'muted' }, `(${r.right}/${r.n})`)),
+        h('span', { class: 'muted small' }, r.n < 5 ? 'few rounds' : r.rate < r.conf - 0.15 ? 'overconfident' : r.rate > r.conf + 0.15 ? 'underconfident' : 'on target'),
+      ])));
 }
 
 /* ---------------- Settings ---------------- */

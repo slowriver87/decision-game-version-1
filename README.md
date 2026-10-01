@@ -11,6 +11,7 @@ It works fully offline once installed. There are no accounts, no tracking, and n
 | **Expected value** | Sure thing vs gamble (gains, losses, coin flips, longshots) | EV, how much EV a wrong pick gave up, loss aversion, longshot bias |
 | **Bayesian updating** | Drag a slider to estimate a probability (metal detectors, lost historical letters, rookie scouts, stock screeners, urns, recession signals, poker tells) | Base rates, shown on a 1,000-dot frequency grid |
 | **Poker pot odds** | Call or fold vs a face-up all-in | Outs, the rule of 2 and 4, pot odds vs exact equity |
+| **Bridge builder** | Pick which of 4 drawn bridges holds the most, then how sure you are (25/50/75/95%) | Depth, tension vs compression, buckling, and confidence calibration |
 | *Kelly bet sizing* | *Phase 2* | |
 | *Optimal stopping* | *Phase 2* | |
 | *Push your luck* | *Phase 2* | |
@@ -23,6 +24,7 @@ Nothing is hardcoded. Every round starts from a random seed, and the generator b
 
 - **EV:** picks a frame, probability and payoff, then sets the sure amount a set distance above or below the gamble's EV. That distance shrinks at higher levels.
 - **Bayes:** picks a base rate (rarer at higher levels), a hit rate and a false-alarm rate. The answer is computed with Bayes' rule, and level 5 adds two positive tests in a row.
+- **Bridges:** picks four designs (plank, I-beam, truss, arch, suspension) at different depths, all with the same steel. Capacity comes from real statics: beam bending (PL/4 = σS), member forces in the triangle frames, and Euler buckling for squeezed members. The winner must beat the runner-up by a clear margin, which shrinks at higher levels. Confidence is scored with a proper scoring rule, so honest confidence earns the most over time.
 - **Poker:** deals random hands until you're behind with 4–15 outs. Exact equity is computed by checking every possible runout (44 on the turn, 990 on the flop). Then it picks a bet size so the right answer clears a minimum margin, and call and fold are each right about half the time.
 
 Because the seed is saved, a half-finished session resumes exactly where you left it, even after your phone kills the browser.

@@ -3,6 +3,9 @@ import { h } from './dom.js';
 import { money, pct } from '../core/format.js';
 import { RANKS, SUITS, SUIT_SYMBOL, rankOf, suitOf } from '../core/cards.js';
 import { frequencyGrid } from './grid.js';
+import { bridgeSvg } from './bridgeArt.js';
+import { spec as bridgeSpec, CONFIDENCE_LEVELS } from '../scenarios/bridge.js';
+import { DESIGNS } from '../core/bridges.js';
 
 export function cardEl(c, mini = false) {
   const suit = SUITS[suitOf(c)];
@@ -82,7 +85,50 @@ function pokerQuestion(sc, answer) {
   };
 }
 
-export const QUESTION = { ev: evQuestion, bayes: bayesQuestion, poker: pokerQuestion };
+function bridgeCard(sc, b, maxSpan, extra = {}) {
+  return h(extra.tag || 'div', { class: `bcard${extra.cls ? ' ' + extra.cls : ''}`, ...extra.attrs },
+    bridgeSvg(b, maxSpan),
+    h('span', { class: 'lbl' }, `${b.letter} · ${DESIGNS[b.design].name}`),
+    h('span', { class: 'spec' }, bridgeSpec(b, sc) || '\u00a0'),
+    extra.footer || null);
+}
+
+function bridgeQuestion(sc, answer) {
+  const maxSpan = Math.max(...sc.bridges.map(b => b.span));
+  let pick = null;
+  const confBtns = CONFIDENCE_LEVELS.map(c =>
+    h('button', { class: 'btn', disabled: true, onclick: () => pick != null && answer({ pick, conf: c }) }, pct(c, 0)));
+  const hint = h('div', { class: 'hint' }, 'Tap the strongest bridge, then how sure you are.');
+  const cards = sc.bridges.map((b, i) => bridgeCard(sc, b, maxSpan, {
+    tag: 'button',
+    attrs: {
+      'aria-pressed': 'false',
+      'aria-label': `${b.letter}: ${DESIGNS[b.design].name}${bridgeSpec(b, sc) ? ', ' + bridgeSpec(b, sc) : ''}`,
+      onclick: () => {
+        pick = i;
+        cards.forEach((c, j) => c.setAttribute('aria-pressed', String(j === i)));
+        confBtns.forEach(btn => { btn.disabled = false; });
+        hint.textContent = `You picked ${b.letter}. How sure are you?`;
+      },
+    },
+  }));
+  return {
+    body: [
+      h('h2', {}, 'Which bridge holds the most?'),
+      h('p', { class: 'scenario-body' }, sc.variedSteel
+        ? 'Each carries a load at mid-span. Spans and the amount of steel differ.'
+        : sc.variedSpan
+          ? 'Each uses the same amount of steel and carries a load at mid-span. Spans differ.'
+          : 'Each uses the same amount of steel, spans the same gap, and carries a load at mid-span.'),
+      h('div', { class: 'bridge-grid' }, cards),
+    ],
+    actions: h('div', { class: 'stack' },
+      h('div', { class: 'estimate' }, hint),
+      h('div', { class: 'conf-row' }, confBtns)),
+  };
+}
+
+export const QUESTION = { ev: evQuestion, bayes: bayesQuestion, poker: pokerQuestion, bridge: bridgeQuestion };
 
 /* ---------------- Feedback visuals ---------------- */
 
@@ -102,6 +148,14 @@ export const VISUAL = {
   ev: evVisual,
   bayes: (sc, result) => frequencyGrid(result.grid),
   poker: (sc, result) => pokerTable(sc, { showOuts: true, outs: result.outs }),
+  bridge: (sc, result) => {
+    const maxSpan = Math.max(...sc.bridges.map(b => b.span));
+    return h('div', { class: 'bridge-grid', style: 'margin:12px 0' }, sc.bridges.map((b, i) => bridgeCard(sc, b, maxSpan, {
+      cls: [i === result.best ? 'best' : '', i === result.pick && i !== result.best ? 'picked' : ''].join(' ').trim(),
+      footer: h('span', { class: 'tonnes' }, `${b.tonnes >= 100 ? Math.round(b.tonnes) : b.tonnes.toFixed(1)} t`,
+        i === result.best ? ' ✓ strongest' : i === result.pick ? ' · your pick' : ''),
+    })));
+  },
 };
 
 export { pct };

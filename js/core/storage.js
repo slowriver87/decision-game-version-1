@@ -25,6 +25,7 @@ export function normalize(raw) {
     correct: !!r.correct,
     biasTags: Array.isArray(r.biasTags) ? r.biasTags.map(String) : [],
     evLost: Number(r.evLost) || 0,
+    ...(typeof r.conf === 'number' && r.conf >= 0 && r.conf <= 1 ? { conf: r.conf } : {}),
   });
   return {
     ...base,

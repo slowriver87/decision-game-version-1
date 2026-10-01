@@ -1,6 +1,6 @@
 // Offline support: precache every file, serve cache-first.
 // Bump VERSION whenever you change any file so phones pick up the update.
-const VERSION = 'dm-v2';
+const VERSION = 'dm-v3';
 const FILES = [
   './',
   './index.html',
@@ -23,14 +23,18 @@ const FILES = [
   './js/core/session.js',
   './js/core/stats.js',
   './js/core/storage.js',
+  './js/core/bridges.js',
+  './js/core/calibration.js',
   './js/scenarios/index.js',
   './js/scenarios/ev.js',
   './js/scenarios/bayes.js',
   './js/scenarios/poker.js',
+  './js/scenarios/bridge.js',
   './js/ui/dom.js',
   './js/ui/grid.js',
   './js/ui/charts.js',
   './js/ui/views.js',
+  './js/ui/bridgeArt.js',
 ];
 
 self.addEventListener('install', event => {

@@ -229,6 +229,27 @@ input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 
 .money-row .k { font-size: 13px; color: var(--muted); }
 .money-row .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* Bridges */
+.bridge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bcard {
+  display: flex; flex-direction: column; align-items: stretch; text-align: left;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+  padding: 6px 8px 10px; min-height: 48px; font: inherit; color: inherit;
+  touch-action: manipulation;
+}
+button.bcard { cursor: pointer; }
+.bcard[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--accent-soft); padding: 5px 7px 9px; }
+.bcard.best { border: 2px solid var(--good); padding: 5px 7px 9px; }
+.bcard.picked { border: 2px dashed var(--bad); padding: 5px 7px 9px; }
+.bcard .bridge-art { width: 100%; height: auto; display: block; }
+.bcard .lbl { font-weight: 650; font-size: 15px; line-height: 1.25; }
+.bcard .spec { font-size: 13px; color: var(--muted); }
+.bcard .tonnes { font-size: 15px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.conf-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.conf-row .btn { padding: 12px 4px; }
+.calib { display: grid; grid-template-columns: auto auto 1fr; gap: 6px 16px; font-variant-numeric: tabular-nums; align-items: baseline; }
+.calib .k { font-size: 13px; color: var(--muted); }
+
 /* ---------- Feedback ---------- */
 .verdict { border-radius: var(--radius); padding: 14px 16px; margin: 8px 0 4px; display: flex; gap: 12px; align-items: flex-start; }
 .verdict.good { background: var(--good-soft); }
